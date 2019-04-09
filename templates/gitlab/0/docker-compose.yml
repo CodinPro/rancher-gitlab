@@ -34,7 +34,7 @@ services:
         gitlab_rails['gitlab_email_enabled'] = true
         gitlab_rails['gitlab_email_from'] = '${gitlab_email_from}'
         gitlab_rails['gitlab_email_display_name'] = '${gitlab_email_display_name}'
-        gitlab_rails['gitlab_email_reply_to'] = '${gitlab_email_reply_to}''
+        gitlab_rails['gitlab_email_reply_to'] = '${gitlab_email_reply_to}'
         gitlab_rails['gravatar_plain_url'] = 'https://secure.gravatar.com/avatar/%{hash}?s=%{size}&d=identicon'
         gitlab_rails['gravatar_ssl_url'] = 'https://secure.gravatar.com/avatar/%{hash}?s=%{size}&d=identicon'
         gitlab_rails['gitlab_shell_ssh_port'] = '${ssh_port}'
