@@ -1,0 +1,152 @@
+.catalog:
+  name: Gitlab Community
+  version: 11.9.6-ce.0
+  description: |
+    Gitlab CE is a free GitHub alternative
+  minimum_rancher_version: v0.56.0
+  maintainer: "Codin.pro <dev@codin.pro>"
+  uuid: gitlab-codin-0
+  questions:
+    - variable: "gitlab_domain"
+      description: "Gitlab domain (i.e. for gitlab.example.com its example.com)"
+      label: "Domain:"
+      required: true
+      default: "example.com"
+      type: "string"
+    - variable: "gitlab_email_from"
+      description: "Gitlab email_from"
+      label: "gitlab_email_from:"
+      required: true
+      default: "gitlab@example.com"
+      type: "string"
+    - variable: "gitlab_email_reply_to"
+      description: "gitlab_email_reply_to"
+      label: "gitlab_email_reply_to:"
+      required: true
+      default: "no-reply@example.com"
+      type: "string"
+    - variable: "gitlab_email_display_name"
+      description: "gitlab_email_display_name"
+      label: "gitlab_email_display_name:"
+      required: true
+      default: "Gitlab"
+      type: "string"
+    - variable: "smtp_enable"
+      description: "smtp_enable"
+      label: "smtp_enable:"
+      required: false
+      default: false
+      type: "enum"
+      options:
+        - true
+        - false
+    - variable: "smtp_address"
+      description: "smtp_address"
+      label: "smtp_address:"
+      required: false
+      default: "smtp.office365.com"
+      type: "string"
+    - variable: "smtp_port"
+      description: "smtp_port"
+      label: "smtp_port:"
+      required: false
+      default: "587"
+      type: "string"
+    - variable: "smtp_domain"
+      description: "smtp_domain"
+      label: "smtp_domain:"
+      required: false
+      default: "example.com"
+      type: "string"
+    - variable: "smtp_user_name"
+      description: "smtp_user_name"
+      label: "smtp_user_name:"
+      required: false
+      default: "gitlab@example.com"
+      type: "string"
+    - variable: "smtp_password"
+      description: "smtp_password"
+      label: "smtp_password:"
+      required: false
+      default: "password"
+      type: "string"
+    - variable: "smtp_authentication"
+      description: "smtp_authentication"
+      label: "smtp_authentication:"
+      required: false
+      default: "login"
+      type: "string"
+    - variable: "smtp_enable_starttls_auto"
+      description: "smtp_enable_starttls_auto"
+      label: "smtp_enable_starttls_auto:"
+      required: false
+      default: true
+      type: "enum"
+      options:
+        - true
+        - false
+    - variable: "smtp_tls"
+      description: "smtp_tls"
+      label: "smtp_tls:"
+      required: false
+      default: "false"
+      type: "string"
+    - variable: "smtp_openssl_veryfy_mode"
+      description: "smtp_openssl_veryfy_mode"
+      label: "smtp_openssl_veryfy_mode:"
+      required: false
+      default: "peer"
+      type: "string"
+    - variable: "ssh_port"
+      description: "SSH port to expose on host. Will be used to bind TCP"
+      label: "SSH port:"
+      required: true
+      default: 22
+      type: "int"
+    - variable: "volumedriver"
+      description: "Choose the Volume Driver being used.(Option: local or rancher-nfs)"
+      label: "Volume Driver:"
+      required: true
+      default: local
+      type: "enum"
+      options:
+        - local
+        - rancher-nfs
+
+gitlab-server:
+  scale: 1
+  retain_ip: true
+  health_check:
+    port: 80
+    interval: 30000
+    unhealthy_threshold: 3
+    strategy: recreate
+    response_timeout: 3000
+    healthy_threshold: 2
+
+lb:
+  scale: 1
+  start_on_create: true
+  lb_config:
+    certs: []
+    port_rules:
+    - hostname: gitlab.${gitlab_domain}
+      priority: 1
+      protocol: http
+      service: gitlab-server
+      source_port: 80
+      target_port: 80
+    - hostname: registry.${gitlab_domain}
+      priority: 2
+      protocol: http
+      service: gitlab-server
+      source_port: 80
+      target_port: 80
+  health_check:
+    healthy_threshold: 2
+    response_timeout: 2000
+    port: 42
+    unhealthy_threshold: 3
+    initializing_timeout: 60000
+    interval: 2000
+    reinitializing_timeout: 60000
